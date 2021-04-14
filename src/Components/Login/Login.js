@@ -1,32 +1,23 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
+import {auth} from "../../firebase";
 import Input from "@material-ui/core/Input";
 import {Button} from "@material-ui/core";
-import "./Signup.css";
-import {db, auth} from "../../firebase";
 
-const Signup = ({user, username, setUser, setUsername, setOpen}) => {
-  const [email, setEmail] = useState("");
+const Login = ({user, setUser, setOpen}) => {
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-  const handleChange = (e, callback) => {
-    callback(e.target.value);
-  };
-  const signup = (e) => {
+  const handleChange = (event, callback) => callback(event.target.value);
+  const login = (e) => {
     e.preventDefault();
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((authUser) => {
-        return authUser.user.updateProfile({
-          displayName: username,
-        });
-      })
-      .catch((err) => setError(err.message));
-    setTimeout(() => setError(""), 5000);
-
+    auth.signInWithEmailAndPassword(email, password).catch((err) => {
+      console.log("Sranje -> " + err.message);
+      setError(err.message);
+      setTimeout(() => setError(""), 5000);
+    });
     if (!error) setOpen(false); //ako je uspješno, zatvoriti modal
   };
-
   return (
     <form action="">
       <img
@@ -45,14 +36,7 @@ const Signup = ({user, username, setUser, setUsername, setOpen}) => {
           </span>
         </div>
       )}
-      <div className="Signup__input">
-        <Input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => handleChange(e, setUsername)}
-        />
-      </div>
+
       <div className="Signup__input">
         <Input
           type="text"
@@ -69,11 +53,11 @@ const Signup = ({user, username, setUser, setUsername, setOpen}) => {
           onChange={(e) => handleChange(e, setPassword)}
         />
       </div>
-      <Button type="submit" style={{width: "100%"}} onClick={signup}>
+      <Button type="submit" style={{width: "100%"}} onClick={login}>
         Sign Up
       </Button>
     </form>
   );
 };
 
-export default Signup;
+export default Login;

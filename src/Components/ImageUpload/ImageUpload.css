@@ -1,0 +1,34 @@
+.ImageUpload {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  margin-block: 10px;
+  bottom: 0;
+  object-fit: contain;
+  padding: 10px;
+  border-top: 1px solid lightgray;
+  box-sizing: border-box;
+}
+.ImageUpload > * {
+  width: 60%;
+  margin: 0 auto;
+  margin-top: 10px;
+}
+
+.ImageUpload > input {
+  border: none;
+  padding: 10px;
+  outline: none;
+  background-color: transparent;
+}
+.ImageUpload > input:focus {
+  background-color: rgb(235, 235, 235);
+  transition: 0.3s;
+  border-radius: 5px;
+}
+
+.ImageUpload__Button {
+  width: 60%;
+  align-self: center;
+}

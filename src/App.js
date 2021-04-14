@@ -7,6 +7,9 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Button} from "@material-ui/core";
 import Header from "./Components/Header/Header";
 import Signup from "./Components/Signup/Signup";
+import Login from "./Components/Login/Login";
+import ImageUpload from "./Components/ImageUpload/ImageUpload";
+import "./Components/Header/Header.css";
 
 function getModalStyle() {
   const top = 50;
@@ -33,9 +36,25 @@ function App() {
   const [modalStyle] = useState(getModalStyle);
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const classes = useStyles();
   const [user, setUser] = useState(null);
+  const [username, setUsername] = useState("");
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        console.log(authUser);
+        setUser(authUser);
+      } else {
+        //user logged out
+        setUser(null);
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [user, username]);
   useEffect(() => {
     db.collection("posts").onSnapshot((snapshot) => {
       setPosts(snapshot.docs.map((doc) => ({id: doc.id, post: doc.data()})));
@@ -51,18 +70,52 @@ function App() {
       >
         <center>
           <div style={modalStyle} className={classes.paper}>
-            <Signup />
+            <Signup
+              user={user}
+              username={username}
+              setUser={setUser}
+              setUsername={setUsername}
+              setOpen={setOpen}
+            />
           </div>
         </center>
       </Modal>
-      <Header />
-      <Button
-        onClick={() => {
-          setOpen(true);
+      <Modal
+        open={loginOpen}
+        onClose={() => {
+          setLoginOpen(!loginOpen);
         }}
       >
-        Sign up
-      </Button>
+        <center>
+          <div style={modalStyle} className={classes.paper}>
+            <Login user={user} setUser={setUser} setOpen={setLoginOpen} />
+          </div>
+        </center>
+      </Modal>
+      <div className="app__header">
+        <img
+          alt="instagram logo"
+          className="app__headerImage"
+          src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
+        />
+        <div>
+          {user ? (
+            <Button onClick={() => auth.signOut()}>Logout</Button>
+          ) : (
+            <>
+              <Button
+                onClick={() => {
+                  setOpen(true);
+                }}
+              >
+                Sign Up
+              </Button>
+              <Button onClick={() => setLoginOpen(true)}>Login</Button>
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="app__body">
         {posts.map(({id, post}) => (
           <Post
@@ -74,6 +127,7 @@ function App() {
           />
         ))}
       </div>
+      {user?.displayName ? <ImageUpload username={user.displayName} /> : null}
     </div>
   );
 }

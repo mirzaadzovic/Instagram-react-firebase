@@ -20,4 +20,7 @@
   color: rgba(29, 14, 14);
   font-size: 11px;
   padding: 5px;
+  position: absolute;
+  top: 50px;
+  left: 50px;
 }
