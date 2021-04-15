@@ -10,6 +10,7 @@ import Signup from "./Components/Signup/Signup";
 import Login from "./Components/Login/Login";
 import ImageUpload from "./Components/ImageUpload/ImageUpload";
 import "./Components/Header/Header.css";
+import InstagramEmbed from "react-instagram-embed";
 
 function getModalStyle() {
   const top = 50;
@@ -40,8 +41,10 @@ function App() {
   const classes = useStyles();
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
-
   useEffect(() => {
+    fetch("http://localhost:8080/users")
+      .then((data) => data.json())
+      .then((json) => console.log(json));
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         console.log(authUser);
@@ -120,10 +123,12 @@ function App() {
         {posts.map(({id, post}) => (
           <Post
             key={id}
+            postId={id}
             imageUrl={post.imageUrl}
             username={post.username}
             caption={post.caption}
             avatar={post.avatarUrl}
+            user={user}
           />
         ))}
       </div>
