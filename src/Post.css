@@ -13,7 +13,8 @@
 }
 .post__text {
   box-sizing: border-box;
-  padding: 10px;
+  padding: 2px;
+  padding: 5px 10px;
   word-wrap: break-word;
 }
 .post__header {
@@ -37,6 +38,7 @@
   font-size: 16px;
   border-radius: 5px;
   width: 80%;
+  margin-left: 5px;
 }
 .Post__form input:focus {
   background-color: rgb(241, 240, 240);

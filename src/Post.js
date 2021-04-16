@@ -3,6 +3,7 @@ import "./Post.css";
 import {Avatar} from "@material-ui/core";
 import {db} from "./firebase.js";
 import {Button} from "@material-ui/core";
+import firebase from "firebase";
 
 const Post = (props) => {
   const [comments, setComments] = useState([]);
@@ -16,13 +17,15 @@ const Post = (props) => {
         .collection("posts")
         .doc(postId)
         .collection("comments")
+        .orderBy("timpestamp")
         .onSnapshot((snapshot) => {
           console.log("Novi snapshot komentara");
           setComments(snapshot.docs.map((doc) => doc.data()));
+          console.log(comments);
         });
     }
     return () => unsubscribe();
-  }, [comments]);
+  }, []);
 
   const postComment = (event) => {
     event.preventDefault();
@@ -30,7 +33,12 @@ const Post = (props) => {
       .collection("posts")
       .doc(props.postId)
       .collection("comments")
-      .set({username: props.user.displayName, text: input});
+      .add({
+        username: props.user.displayName,
+        text: input,
+        timpestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    setInput("");
   };
   return (
     <div className="post">
@@ -49,22 +57,31 @@ const Post = (props) => {
         <b>{props.username}</b> {props.caption}
       </p>
       {comments.map((c) => {
-        <p className="post__text">
-          <b>{c.username}</b> {c.text}
-        </p>;
+        return (
+          <p className="post__text">
+            <b>{c.username}</b> {c.text}
+          </p>
+        );
       })}
-      <center>
-        <form className="Post__form">
-          <input
-            placeholder="Add comment..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <Button type="submit" onClick={postComment} disabled={!input}>
-            Comment
-          </Button>
-        </form>
-      </center>
+      {props.user ? (
+        <center>
+          <form className="Post__form">
+            <input
+              placeholder="Add comment..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <Button
+              type="submit"
+              onClick={postComment}
+              disabled={!input}
+              font-size="12"
+            >
+              Comment
+            </Button>
+          </form>
+        </center>
+      ) : null}
     </div>
   );
 };

@@ -13,4 +13,5 @@
 
 .app__header img {
   object-fit: contain;
+  margin-left: 15px;
 }

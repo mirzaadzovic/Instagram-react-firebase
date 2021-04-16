@@ -4,7 +4,7 @@ import {useState, useEffect} from "react";
 import {auth, db} from "./firebase";
 import Modal from "@material-ui/core/Modal";
 import {makeStyles} from "@material-ui/core/styles";
-import {Button} from "@material-ui/core";
+import {Button, Avatar} from "@material-ui/core";
 import Header from "./Components/Header/Header";
 import Signup from "./Components/Signup/Signup";
 import Login from "./Components/Login/Login";
@@ -42,9 +42,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   useEffect(() => {
-    fetch("http://localhost:8080/users")
-      .then((data) => data.json())
-      .then((json) => console.log(json));
+    // fetch("http://localhost:8080/users")
+    //   .then((data) => data.json())
+    //   .then((json) => console.log(json));
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         console.log(authUser);
@@ -59,9 +59,11 @@ function App() {
     };
   }, [user, username]);
   useEffect(() => {
-    db.collection("posts").onSnapshot((snapshot) => {
-      setPosts(snapshot.docs.map((doc) => ({id: doc.id, post: doc.data()})));
-    });
+    db.collection("posts")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setPosts(snapshot.docs.map((doc) => ({id: doc.id, post: doc.data()})));
+      });
   }, []);
   return (
     <div className="app">
@@ -101,9 +103,17 @@ function App() {
           className="app__headerImage"
           src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
         />
-        <div>
+        <div style={{display: "flex"}}>
           {user ? (
-            <Button onClick={() => auth.signOut()}>Logout</Button>
+            <>
+              <Avatar
+                alt={user.displayName}
+                src={user.avatarUrl ? user.avararUrl : ""}
+              >
+                {user.displayName.slice(0, 1).toUpperCase()}
+              </Avatar>
+              <Button onClick={() => auth.signOut()}>Logout</Button>
+            </>
           ) : (
             <>
               <Button
@@ -113,7 +123,9 @@ function App() {
               >
                 Sign Up
               </Button>
-              <Button onClick={() => setLoginOpen(true)}>Login</Button>
+              <Button onClick={() => setLoginOpen(true)} font-size="12">
+                Login
+              </Button>
             </>
           )}
         </div>
